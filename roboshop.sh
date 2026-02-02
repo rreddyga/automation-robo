@@ -1,6 +1,8 @@
 #!/bin/bash
 SG_ID="sg-0d4fbbcb5f7b89575"
 AMI_ID="ami-0220d79f3f480ecf5"
+ZONE_ID="Z0853835SDE0JTKZUUR2"
+DOMAIN_NAME="sanathananelaform.online"
 
 for instance in $@ # user may pass mongo,cataglouge
 do
@@ -21,6 +23,26 @@ do
         --instance-ids $INSTANCE_ID \
         --query 'Reservations[0].Instances[0].PrivateIpAddress' \
         --output text)
+
+        RECORD_NAME="$instance.$DOMAIN_NAME" #mongodb.sanathananelaform.online
     fi
     echo  "IP Address :$IP"
+
+# Update Route53 record
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+    "Changes": [{
+        "Action": "UPSERT",
+        "ResourceRecordSet": {
+        "Name": "'$RECORD_NAME'",
+        "Type": "A",
+        "TTL": 1,
+        "ResourceRecords": [{"Value": "'$IP'"}]
+        }
+    }]
+    }
+    '
+    echo "record updated for $instance
 done
