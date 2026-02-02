@@ -3,7 +3,7 @@
 # we need to check the root user or not 
 
 USERId=$(id -u)
-LOGS_FOLDER="/var/log/shell-script"
+LOGS_FOLDER="/var/log/shell-roboshop"
 LOGS_FILE=$LOGS_FOLDER/$0.log
 R="\e[31m]"
 G="\e[32m]"
