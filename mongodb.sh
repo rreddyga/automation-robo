@@ -5,10 +5,10 @@
 USERId=$(id -u)
 LOGS_FOLDER="/var/log/shell-roboshop"
 LOGS_FILE=$LOGS_FOLDER/$0.log
-R="\e[31m]"
-G="\e[32m]"
-Y="\e[33m]"
-N="\e[0m]"
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+N="\e[0m"
 
 if [ $USERId -ne 0 ]; then
     echo "$R please run  this script  with the root user access $N" | tee -a $LOGS_FILE
@@ -27,10 +27,10 @@ VALIDATE()
 cp mongo.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copying Mongo Repo" 
 
-dnf install mongodb-org -y 
+dnf install mongodb-org -y &>>LOGS_FILE
 VALIDATE $? "Installing mongodb server"
 
-systemctl enable mongod 
+systemctl enable mongod &>>LOGS_FILE
 VALIDATE $? "Enabled mongod"
 systemctl start mongod 
 VALIDATE $? "start mongodb"
