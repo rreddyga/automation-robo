@@ -10,6 +10,9 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
+SCRIPT_DIR=$PWD
+MYSQL_HOST="mysql.sanathananelaform.online"
+
 if [ $USERId -ne 0 ]; then
     echo -e "$R please run  this script  with the root user access $N" | tee -a $LOGS_FILE
     exit 1
@@ -24,14 +27,16 @@ VALIDATE()
     fi
 }
 
-dnf install mysql-server -y &>>LOGS_FILE
-VALIDATE $? "installing mysql-server"
+cp $SCRIPT_DIR/rabbitmq.repo /etc/yum.repos.d/rabbitmq.repo
 
-systemctl enable mysqld
-VALIDATE $? "Enable mysqld"
-systemctl start mysqld  
-VALIDATE $? "start mysqld"
+dnf install rabbitmq-server -y
+VALIDATE "Installing rabbitmq server"
 
-# read from the user
-mysql_secure_installation --set-root-pass RoboShop@1
-VALIDATE $? "Setup the root password"
+systemctl enable rabbitmq-server
+VALIDATE "Enable rabbitmq-server"
+
+systemctl start rabbitmq-server
+VALIDATE "started rabbitmq-server"
+
+rabbitmqctl add_user roboshop roboshop123
+rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
